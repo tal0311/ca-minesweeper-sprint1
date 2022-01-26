@@ -64,3 +64,43 @@ h1 {
   width: 150px;
   height: 80;
 }
+
+.strikes-container img {
+  height: 60px;
+  width: 60px;
+  color: antiquewhite;
+  font-weight: bold;
+  background-color: antiquewhite;
+  border-radius: 50%;
+}
+.strikes-container {
+  padding-top: 20px;
+}
+
+.header {
+  width: 80%;
+  display: flex;
+  margin: auto;
+  justify-content: center;
+  margin-bottom: 25px;
+}
+
+.timer span {
+  box-sizing: border-box;
+  color: antiquewhite;
+  font-size: 70px;
+  margin-right: 50px;
+  width: 200px;
+  position: absolute;
+  right: 50%;
+}
+
+.timer-container {
+  width: 400px;
+  position: absolute;
+}
+
+.crashed {
+  transition: 0.6s ease-out;
+  opacity: 0.1;
+}

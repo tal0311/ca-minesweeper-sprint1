@@ -82,7 +82,7 @@ function getRandomMinePos(length) {
     }
     gMineposes.push(pos)
   }
-  console.log(gMineposes)
+
   placeMinesOnBoard(gMineposes)
   gMineposes = []
 }
