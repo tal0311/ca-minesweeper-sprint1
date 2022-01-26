@@ -1,0 +1,44 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #333;
+  text-align: center;
+  margin: auto;
+}
+
+.btn {
+  height: 50px;
+  width: 75px;
+  color: #333;
+  font-size: large;
+  margin-bottom: 50px;
+}
+
+table tr td {
+  height: 50px;
+  width: 50px;
+  border: 2px solid white;
+  color: antiquewhite;
+  cursor: pointer;
+}
+
+table {
+  margin: auto;
+}
+h1 {
+  color: antiquewhite;
+}
+
+.hidden {
+  background-color: antiquewhite;
+}
+
+.mine {
+  background-color: rgb(223, 87, 114);
+}
+
+.game-over {
+  pointer-events: none;
+}
