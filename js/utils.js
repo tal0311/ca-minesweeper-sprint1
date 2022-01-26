@@ -82,7 +82,7 @@ function getRandomMinePos(length) {
     }
     gMineposes.push(pos)
   }
-  console.log(gMineposes.length)
+  console.log(gMineposes)
   placeMinesOnBoard(gMineposes)
   gMineposes = []
 }
@@ -90,12 +90,11 @@ function getRandomMinePos(length) {
 function getRandomInt(min, max) {
   min = Math.ceil(min)
   max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min //The maximum is inclusive and the minimum is inclusive
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 function placeMinesOnBoard(minePoses) {
   for (let i = 0; i < minePoses.length; i++) {
-    console.log(minePoses[i])
     var mine = minePoses[i]
     gBoard[mine.i][mine.j].isMine = true
   }

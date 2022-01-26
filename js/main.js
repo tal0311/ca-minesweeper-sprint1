@@ -31,7 +31,6 @@ function init() {
   renderBoard(gBoard, '.main')
 }
 
-// !fix level change
 function changeLevel(size, mines) {
   gLevel.SIZE = size
   gLevel.MINES = mines
@@ -92,7 +91,7 @@ function rightClick(ev, i, j) {
   gBoard[i][j].isMarked = true
 
   renderCell({ i, j }, FLAG)
-
+  checkVictory()
   gMineCount--
 }
 
@@ -100,10 +99,9 @@ function gameOver(elCell, i, j) {
   elCell.classList.add('mine')
   console.log('game over')
   renderCell({ i, j }, MINE)
-  var elCells = document.querySelectorAll('.cell [data-ismine="true"]')
+  var elCells = document.querySelectorAll('.cell')
 
   for (let i = 0; i < elCells.length; i++) {
-    elCells[i].classList.remove('hidden')
     elCells[i].classList.add('game-over')
   }
 
@@ -129,12 +127,17 @@ function revelNegs() {
   gCurrCellNegs = []
 }
 
-function checkVictory() {}
-// if (currNeg.isMine === false) {
-//   currNeg.isShown = true
-//   console.log(gBoard[location.i][location.j])
-//   var elCell = document.querySelector(
-//     `.cell-${location.i}-${location.j},[data-ismine="false"]`
-//   )
-//   console.log(elCell)
-//   // elCell.classList.remove('hidden')
+function checkVictory() {
+  var count = 0
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[0].length; j++) {
+      var cell = gBoard[i][j]
+      if (cell.isMine && cell.isMarked) count++
+    }
+  }
+  if (count === gLevel.MINES) {
+    console.log('victory!!!')
+    var elh1 = document.querySelector('h1')
+    elh1.innerText = 'You are Victorious'
+  }
+}
