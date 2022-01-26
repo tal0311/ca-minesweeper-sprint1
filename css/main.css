@@ -10,16 +10,18 @@ body {
 
 .btn {
   height: 50px;
-  width: 75px;
+  width: 100px;
   color: #333;
   font-size: large;
   margin-bottom: 50px;
+  margin-left: 10px;
+  background-color: rgb(218, 217, 217);
 }
 
 table tr td {
   height: 50px;
   width: 50px;
-  border: 2px solid white;
+  border: 3px solid white;
   color: antiquewhite;
   cursor: pointer;
 }
@@ -32,6 +34,7 @@ h1 {
 }
 
 .hidden {
+  transition: ease-out 0.8s;
   background-color: antiquewhite;
 }
 
@@ -40,5 +43,12 @@ h1 {
 }
 
 .game-over {
+  background-color: crimson;
   pointer-events: none;
+}
+
+.restart {
+  color: #333;
+  font-size: large;
+  font-weight: bold;
 }

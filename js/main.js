@@ -23,6 +23,7 @@ var gGame = {
 }
 
 function init() {
+  resetUi()
   gGame.isOn = true
   gBoard = buildMat()
 
@@ -92,18 +93,22 @@ function rightClick(ev, i, j) {
 
   renderCell({ i, j }, FLAG)
   checkVictory()
-  gMineCount--
+  gMineCount-- //!make this work
 }
 
 function gameOver(elCell, i, j) {
   elCell.classList.add('mine')
-  console.log('game over')
+  var elH1 = document.querySelector('h1')
+  elH1.innerText = 'Mines are bad for you...'
+
   renderCell({ i, j }, MINE)
   var elCells = document.querySelectorAll('.cell')
 
   for (let i = 0; i < elCells.length; i++) {
     elCells[i].classList.add('game-over')
   }
+  var elBtn = document.querySelector('.restart')
+  elBtn.hidden = false
 
   // TODO: render button for restart
   // TODO:change smiley face
@@ -136,8 +141,14 @@ function checkVictory() {
     }
   }
   if (count === gLevel.MINES) {
-    console.log('victory!!!')
     var elh1 = document.querySelector('h1')
     elh1.innerText = 'You are Victorious'
   }
+}
+
+function resetUi() {
+  var elH1 = document.querySelector('h1')
+  elH1.innerText = 'Classic Minesweeper'
+  var elBtn = document.querySelector('.restart')
+  elBtn.hidden = true
 }
