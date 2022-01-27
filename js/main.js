@@ -83,6 +83,7 @@ function rightClick(ev, i, j) {
     gBoard[i][j].isMarked = false
     gMineCount++
     updateCountUi()
+    checkVictory()
     return
   }
   gBoard[i][j].isMarked = true
@@ -117,8 +118,10 @@ function updateStrike(elCell, i, j) {
 }
 
 function endGame(i, j) {
+  renderSmiley('lose')
   endStopWatch()
   var elH1 = document.querySelector('h1')
+  elH1.style.color = 'rgb(223, 87, 114)'
   elH1.innerText = 'Mines are bad for you...'
   renderCell({ i, j }, MINE)
   var elCells = document.querySelectorAll('.cell')
@@ -155,18 +158,26 @@ function checkVictory() {
       if (cell.isMine && cell.isMarked) count++
     }
   }
+
+  // var noHidden = isHidden()
   if (count === gLevel.MINES) {
-    var elh1 = document.querySelector('h1')
-    elh1.innerText = 'You are Victorious'
+    var elH1 = document.querySelector('h1')
+    elH1.style.backgroundColor = 'rgb(223, 87, 114)'
+
+    elH1.innerText = 'You are Victorious'
+    renderSmiley('win')
+    endStopWatch()
   }
-  endStopWatch()
 }
 
 function resetUi() {
   gStrikes = 0
   gMineCount = gLevel.MINES
+  renderSmiley('start')
   updateCountUi()
   var elH1 = document.querySelector('h1')
+  elH1.style.backgroundColor = '#333'
+  elH1.style.color = 'antiquewhite'
   elH1.innerText = 'Classic Minesweeper'
   var elBtn = document.querySelector('.restart')
   elBtn.hidden = true
@@ -194,4 +205,19 @@ function updateWatch() {
 function endStopWatch() {
   clearInterval(gWatchInterval)
   gWatchInterval = null
+}
+
+function renderSmiley(gameStatus) {
+  var smiley = document.querySelector('.smiley')
+
+  switch (gameStatus) {
+    case 'win':
+      smiley.innerText = SMILEY_WIN
+      break
+    case 'lose':
+      smiley.innerText = SMILEY_LOSE
+      break
+    case 'start':
+      smiley.innerText = SMILEY_START
+  }
 }

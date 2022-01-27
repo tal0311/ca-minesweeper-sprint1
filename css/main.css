@@ -83,7 +83,7 @@ h1 {
   display: flex;
   margin: auto;
   justify-content: center;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
 }
 
 .timer span {
@@ -117,4 +117,11 @@ h1 {
 .mines-counter-container {
   position: relative;
   margin-left: 15px;
+}
+.smiley {
+  margin-top: 0px;
+  margin-bottom: 5px;
+  font-size: 48px;
+  cursor: pointer;
+  opacity: 0.5;
 }
