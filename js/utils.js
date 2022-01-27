@@ -128,7 +128,7 @@ function getAllMines() {
       }
     }
   }
-  console.log(minesPos)
+
   return minesPos
 }
 
@@ -141,6 +141,5 @@ function getHiddenMines() {
     hiddenCells.push(elHiddenCell)
   }
 
-  console.log(hiddenCells)
   return hiddenCells
 }
