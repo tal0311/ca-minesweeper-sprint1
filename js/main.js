@@ -21,6 +21,8 @@ var gGame = {
 }
 
 function init() {
+  endStopWatch()
+  gGame.isFirstMove = true
   gGame.isOn = true
   resetUi()
   gBoard = buildMat()
@@ -31,6 +33,7 @@ function init() {
 function changeLevel(size, mines) {
   gLevel.SIZE = size
   gLevel.MINES = mines
+
   init()
 }
 
@@ -184,6 +187,7 @@ function remainderHiddenCells() {
 
 function resetUi() {
   //!move ui reset to another file
+
   gStrikes = 0
   gMineCount = gLevel.MINES
   renderSmiley('start')
@@ -209,8 +213,10 @@ function resetUi() {
   }
 }
 
+//!not working well...
 function startStopWatch() {
-  gWatchInterval = setInterval(updateWatch, 10)
+  debugger
+  gWatchInterval = setInterval(updateWatch, 1)
   gStartTime = Date.now()
 }
 
@@ -242,23 +248,18 @@ function renderSmiley(gameStatus) {
 }
 
 var ghiddencells
-var gHintInTimeout
 function useHint(elHint) {
-  elHint.classList.add('hide-hint') //revers on ui reset
-
+  elHint.classList.add('hide-hint')
   activateHint()
 }
 
 function activateHint() {
   ghiddencells = getHiddenMines()
-
   var showCells = ghiddencells.slice()
-
   for (let i = 0; i < showCells.length; i++) {
     var elCell = showCells[i]
     elCell.classList.remove('hidden')
   }
-
   setTimeout(function () {
     for (let i = 0; i < showCells.length; i++) {
       var elCell = showCells[i]
