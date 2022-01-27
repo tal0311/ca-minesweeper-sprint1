@@ -77,7 +77,6 @@ function clickCell(elCell, i, j) {
   }
 }
 
-// !fix this
 function firstMove(i, j) {
   gGame.isFirstMove = false
   init()
@@ -95,13 +94,14 @@ function rightClick(ev, i, j) {
     gBoard[i][j].isMarked = false
     gMineCount++
     updateCountUi()
+    // checkVictory()  //!delete this
     return
   }
   gBoard[i][j].isMarked = true
 
   renderCell({ i, j }, FLAG)
   checkVictory()
-  gMineCount-- //!make this work
+  gMineCount--
   updateCountUi()
 }
 
@@ -111,15 +111,12 @@ function updateCountUi() {
 }
 function gameOver(elCell, i, j) {
   updateStrike(elCell, i, j)
-
-  // TODO: go to localStorage()
 }
 
 function localStorage() {
   console.log('this function will put value in local storage')
 }
 
-// mark te hitted cell and strike
 var gElstrikes = document.querySelectorAll('.strikes-container img')
 function updateStrike(elCell, i, j) {
   var strike = gElstrikes[gStrikes]
@@ -169,6 +166,7 @@ function checkVictory() {
     var elh1 = document.querySelector('h1')
     elh1.innerText = 'You are Victorious'
   }
+  endStopWatch()
 }
 
 function resetUi() {
