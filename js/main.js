@@ -163,7 +163,6 @@ function checkVictory() {
   if (count === gLevel.MINES) {
     var elH1 = document.querySelector('h1')
     elH1.style.backgroundColor = 'rgb(223, 87, 114)'
-
     elH1.innerText = 'You are Victorious'
     renderSmiley('win')
     endStopWatch()
@@ -187,6 +186,13 @@ function resetUi() {
   for (let i = 0; i < elStrikes.length; i++) {
     var strike = elStrikes[i]
     strike.classList.remove('crashed')
+  }
+
+  var elHints = document.querySelectorAll('.hint')
+  for (let i = 0; i < elHints.length; i++) {
+    var elHint = elHints[i]
+    console.log(elHint)
+    elHint.classList.remove('hide-hint')
   }
 }
 
@@ -220,4 +226,30 @@ function renderSmiley(gameStatus) {
     case 'start':
       smiley.innerText = SMILEY_START
   }
+}
+
+var ghiddencells
+var gHintInTimeout
+function useHint(elHint) {
+  elHint.classList.add('hide-hint') //revers on ui reset
+
+  activateHint()
+}
+
+function activateHint() {
+  ghiddencells = getHiddenMines()
+
+  var showCells = ghiddencells.slice()
+
+  for (let i = 0; i < showCells.length; i++) {
+    var elCell = showCells[i]
+    elCell.classList.remove('hidden')
+  }
+
+  setTimeout(function () {
+    for (let i = 0; i < showCells.length; i++) {
+      var elCell = showCells[i]
+      elCell.classList.add('hidden')
+    }
+  }, 1500)
 }

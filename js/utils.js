@@ -132,9 +132,15 @@ function getAllMines() {
   return minesPos
 }
 
-function isHidden() {
-  var hiddenTds = document.querySelectorAll('.hidden[data-ismine="false"]')
-  if (hiddenTds.length + gLevel.MINES === gLevel.SIZE ** 2) {
-    return true
-  } else return false
+function getHiddenMines() {
+  var hiddenCells = []
+  var hiddenTds = document.querySelectorAll('.hidden[data-ismine="true"]')
+
+  for (let i = 0; i < hiddenTds.length; i++) {
+    var elHiddenCell = hiddenTds[i]
+    hiddenCells.push(elHiddenCell)
+  }
+
+  console.log(hiddenCells)
+  return hiddenCells
 }
