@@ -1,13 +1,9 @@
 'use strict'
 
-// TODO:make board size dynamic !use number function
-
 var gLevel = {
   SIZE: 4,
   MINES: 2,
 }
-
-//TODO:make random number of mines with function
 
 var gMineCount
 var gCurrCellNegs = []
@@ -18,26 +14,22 @@ var gStrikes
 var gGame = {
   isOn: false,
   shownCount: 0,
-  markedCount: 0,
-  secsPassed: 0,
+  markedCount: 0, //!delete this
+  secsPassed: 0, // TODO: MAKE THIS WORK
   isFirstMove: true,
 }
 
 function init() {
   gGame.isOn = true
   resetUi()
-
   gBoard = buildMat()
-
   getRandomMinePos(gLevel.MINES)
-
   renderBoard(gBoard, '.main')
 }
 
 function changeLevel(size, mines) {
   gLevel.SIZE = size
   gLevel.MINES = mines
-
   init()
 }
 
@@ -60,7 +52,6 @@ function clickCell(elCell, i, j) {
   }
 
   var minesAround = countMinesAround(gBoard, i, j)
-
   if (minesAround > 0) {
     currCell.isShown = true
     elCell.classList.remove('hidden')
@@ -80,9 +71,7 @@ function clickCell(elCell, i, j) {
 function firstMove(i, j) {
   gGame.isFirstMove = false
   init()
-
   gBoard[i][j].isMine = false
-
   gBoard[i][j].isMine = true
   renderCell({ i, j }, EMPTY)
 }
@@ -94,11 +83,9 @@ function rightClick(ev, i, j) {
     gBoard[i][j].isMarked = false
     gMineCount++
     updateCountUi()
-    // checkVictory()  //!delete this
     return
   }
   gBoard[i][j].isMarked = true
-
   renderCell({ i, j }, FLAG)
   checkVictory()
   gMineCount--
@@ -125,23 +112,30 @@ function updateStrike(elCell, i, j) {
 
   elCell.classList.add('mine')
   renderCell({ i, j }, MINE)
-  if (gStrikes > 2) endgame(i, j)
+  if (gStrikes > 2) endGame(i, j)
   return
 }
 
-// ends the game
-function endgame(i, j) {
+function endGame(i, j) {
   endStopWatch()
   var elH1 = document.querySelector('h1')
   elH1.innerText = 'Mines are bad for you...'
   renderCell({ i, j }, MINE)
   var elCells = document.querySelectorAll('.cell')
-
   for (let i = 0; i < elCells.length; i++) {
     elCells[i].classList.add('game-over')
   }
+  var minesPos = getAllMines()
+  showAllMines(minesPos)
   var elBtn = document.querySelector('.restart')
   elBtn.hidden = false
+}
+
+function showAllMines(locations) {
+  for (let i = 0; i < locations.length; i++) {
+    var location = locations[i]
+    renderCell(location, MINE)
+  }
 }
 
 function revelNegs() {
@@ -150,7 +144,6 @@ function revelNegs() {
     var location = { i: gCurrCellNegs[i].i, j: gCurrCellNegs[i].j }
     removeClassByLocation(location, 'hidden')
   }
-
   gCurrCellNegs = []
 }
 
@@ -177,7 +170,8 @@ function resetUi() {
   elH1.innerText = 'Classic Minesweeper'
   var elBtn = document.querySelector('.restart')
   elBtn.hidden = true
-
+  var elTime = document.querySelector('.timer span')
+  elTime.innerText = 0
   var elStrikes = document.querySelectorAll('.strikes-container img')
   for (let i = 0; i < elStrikes.length; i++) {
     var strike = elStrikes[i]

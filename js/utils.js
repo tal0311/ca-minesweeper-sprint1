@@ -38,6 +38,21 @@ function renderBoard(mat, selector) {
   var elContainer = document.querySelector(selector)
   elContainer.innerHTML = strHTML
 }
+function firstRender(mat, selector) {
+  var strHTML = `<table border="1"><tbody>`
+  for (var i = 0; i < gLevel.SIZE; i++) {
+    strHTML += `<tr>`
+    for (var j = 0; j < gLevel.SIZE; j++) {
+      var cell = mat[i][j]
+      var className = `hidden cell cell-${i}-${j}`
+      strHTML += `<td  class=" ${className}" onclick="clickCell(this, ${i}, ${j})" oncontextmenu="rightClick(event, ${i},${j})" contextmenu="mymenu">  </td>`
+    }
+    strHTML += `</tr>`
+  }
+  strHTML += `</tbody></table>`
+  var elContainer = document.querySelector(selector)
+  elContainer.innerHTML = strHTML
+}
 
 // nags function will take mat location i j return negs count
 
@@ -98,4 +113,17 @@ function placeMinesOnBoard(minePoses) {
     var mine = minePoses[i]
     gBoard[mine.i][mine.j].isMine = true
   }
+}
+
+function getAllMines() {
+  var minesPos = []
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard[0].length; j++) {
+      var cell = gBoard[i][j]
+      if (cell.isMine) {
+        minesPos.push({ i, j })
+      }
+    }
+  }
+  return minesPos
 }
