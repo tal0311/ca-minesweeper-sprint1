@@ -11,6 +11,7 @@ var gStartTime
 var gWatchInterval
 var gBoard
 var gStrikes
+
 var gGame = {
   isOn: false,
   shownCount: 0,
@@ -57,7 +58,8 @@ function clickCell(elCell, i, j) {
     elCell.classList.remove('hidden')
     elCell.textContent = minesAround
     gGame.isFirstMove = false
-
+    var hidden = remainderHiddenCells()
+    if (hidden < 0) checkVictory()
     return
   }
   if (!minesAround) {
@@ -65,6 +67,8 @@ function clickCell(elCell, i, j) {
     gGame.isFirstMove = false
     elCell.classList.remove('hidden')
     revelNegs({ i, j })
+    var hidden = remainderHiddenCells()
+    if (hidden < 0) checkVictory()
   }
 }
 
@@ -159,9 +163,11 @@ function checkVictory() {
     }
   }
 
-  // var noHidden = isHidden()
-  if (count === gLevel.MINES) {
+  var hidden = remainderHiddenCells()
+
+  if (count === gLevel.MINES && hidden < 0) {
     var elH1 = document.querySelector('h1')
+
     elH1.style.backgroundColor = 'rgb(223, 87, 114)'
     elH1.innerText = 'You are Victorious'
     renderSmiley('win')
@@ -169,7 +175,15 @@ function checkVictory() {
   }
 }
 
+function remainderHiddenCells() {
+  var hiddenCells = getHiddenMines()
+  var length = hiddenCells.length
+
+  return length - 1
+}
+
 function resetUi() {
+  //!move ui reset to another file
   gStrikes = 0
   gMineCount = gLevel.MINES
   renderSmiley('start')
@@ -191,7 +205,6 @@ function resetUi() {
   var elHints = document.querySelectorAll('.hint')
   for (let i = 0; i < elHints.length; i++) {
     var elHint = elHints[i]
-    console.log(elHint)
     elHint.classList.remove('hide-hint')
   }
 }

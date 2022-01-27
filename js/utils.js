@@ -101,8 +101,8 @@ function getRandomMinePos(length) {
     gMineposes.push(pos)
   }
 
+  if (gMineposes.length < gLevel.MINES) getRandomMinePos(gLevel.MINES)
   placeMinesOnBoard(gMineposes)
-  gMineposes = []
 }
 
 function getRandomInt(min, max) {
@@ -134,7 +134,7 @@ function getAllMines() {
 
 function getHiddenMines() {
   var hiddenCells = []
-  var hiddenTds = document.querySelectorAll('.hidden[data-ismine="true"]')
+  var hiddenTds = document.querySelectorAll('.hidden[data-ismine="false"]')
 
   for (let i = 0; i < hiddenTds.length; i++) {
     var elHiddenCell = hiddenTds[i]
