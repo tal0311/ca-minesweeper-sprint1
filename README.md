@@ -3,4 +3,5 @@
 This game is part of Sprint's No. 1 academic coding bootcamp.
 The project was written in Vanilla JS.
 
-### link 
+### Link to priject
+https://tal0311.github.io/ca-minesweeper-sprint1/
