@@ -9,7 +9,7 @@ var gLevel = {
 
 //TODO:make random number of mines with function
 
-var gMineCount = gLevel.MINES
+var gMineCount
 var gCurrCellNegs = []
 var gStartTime
 var gWatchInterval
@@ -24,12 +24,13 @@ var gGame = {
 }
 
 function init() {
-  gStrikes = 0
-  resetUi()
   gGame.isOn = true
+  resetUi()
+
   gBoard = buildMat()
 
   getRandomMinePos(gLevel.MINES)
+
   renderBoard(gBoard, '.main')
 }
 
@@ -92,6 +93,8 @@ function rightClick(ev, i, j) {
   if (gBoard[i][j].isMarked) {
     renderCell({ i, j }, EMPTY)
     gBoard[i][j].isMarked = false
+    gMineCount++
+    updateCountUi()
     return
   }
   gBoard[i][j].isMarked = true
@@ -99,8 +102,13 @@ function rightClick(ev, i, j) {
   renderCell({ i, j }, FLAG)
   checkVictory()
   gMineCount-- //!make this work
+  updateCountUi()
 }
 
+function updateCountUi() {
+  var elSpan = document.querySelector('.mines-counter span')
+  elSpan.innerText = gMineCount
+}
 function gameOver(elCell, i, j) {
   updateStrike(elCell, i, j)
 
@@ -146,16 +154,6 @@ function revelNegs() {
     removeClassByLocation(location, 'hidden')
   }
 
-  //!delete this at the end
-  // // !maybe find negs of negs
-  // for (let i = 0; i < gCurrCellNegs.length; i++) {
-  //   var cell = gCurrCellNegs[i]
-  //   console.log('cell:', cell.i, cell.j)
-  //   var currNeg = gCurrCellNegs.splice(i, 1)
-  //   var res = countMinesAround(gBoard, currNeg.i, currNeg.j)
-  //   console.log('res:', res)
-  // }
-
   gCurrCellNegs = []
 }
 
@@ -174,6 +172,9 @@ function checkVictory() {
 }
 
 function resetUi() {
+  gStrikes = 0
+  gMineCount = gLevel.MINES
+  updateCountUi()
   var elH1 = document.querySelector('h1')
   elH1.innerText = 'Classic Minesweeper'
   var elBtn = document.querySelector('.restart')
@@ -186,8 +187,6 @@ function resetUi() {
   }
 }
 
-// timer
-// TODO: stop timer at game over
 function startStopWatch() {
   gWatchInterval = setInterval(updateWatch, 10)
   gStartTime = Date.now()
