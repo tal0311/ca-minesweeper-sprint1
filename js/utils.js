@@ -56,7 +56,7 @@ function countMinesAround(mat, rowIdx, colIdx) {
       }
     }
   }
-  console.log(gCurrCellNegs)
+
   return count
 }
 

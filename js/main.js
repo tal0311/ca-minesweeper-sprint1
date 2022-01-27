@@ -29,10 +29,8 @@ function init() {
   gGame.isOn = true
   gBoard = buildMat()
 
-  console.table(gBoard)
   getRandomMinePos(gLevel.MINES)
   renderBoard(gBoard, '.main')
-  startStopWatch()
 }
 
 function changeLevel(size, mines) {
@@ -47,6 +45,9 @@ function clickCell(elCell, i, j) {
 
   var currCell = gBoard[i][j]
   currCell.isShown = true
+  if (gGame.isFirstMove) {
+    startStopWatch()
+  }
 
   if (gGame.isFirstMove && currCell.isMine) {
     firstMove(i, j)
@@ -80,11 +81,10 @@ function firstMove(i, j) {
   gGame.isFirstMove = false
   init()
 
-  console.log(i, j)
   gBoard[i][j].isMine = false
 
   gBoard[i][j].isMine = true
-  renderCell({ i, j }, MINE)
+  renderCell({ i, j }, EMPTY)
 }
 
 function rightClick(ev, i, j) {
@@ -102,39 +102,41 @@ function rightClick(ev, i, j) {
 }
 
 function gameOver(elCell, i, j) {
-  var elStrikes = document.querySelectorAll('.strikes-container img')
-  elStrikes[gStrikes].classList.add('crashed')
-  gStrikes++
-  console.log(gStrikes, elStrikes)
-
-  console.log(elStrikes)
-  elCell.classList.add('mine')
-  renderCell({ i, j }, MINE)
-
-  if (gStrikes >= 3) {
-    endStopWatch()
-    var elH1 = document.querySelector('h1')
-    elH1.innerText = 'Mines are bad for you...'
-    renderCell({ i, j }, MINE)
-    var elCells = document.querySelectorAll('.cell')
-
-    for (let i = 0; i < elCells.length; i++) {
-      elCells[i].classList.add('game-over')
-    }
-    var elBtn = document.querySelector('.restart')
-    elBtn.hidden = false
-  }
-
-  // TODO: render button for restart
-  // TODO:change smiley face
-  // TODO: show modal
-  // TODO: stop timer
+  updateStrike(elCell, i, j)
 
   // TODO: go to localStorage()
 }
 
 function localStorage() {
   console.log('this function will put value in local storage')
+}
+
+// mark te hitted cell and strike
+var gElstrikes = document.querySelectorAll('.strikes-container img')
+function updateStrike(elCell, i, j) {
+  var strike = gElstrikes[gStrikes]
+  strike.classList.add('crashed')
+  gStrikes++
+
+  elCell.classList.add('mine')
+  renderCell({ i, j }, MINE)
+  if (gStrikes > 2) endgame(i, j)
+  return
+}
+
+// ends the game
+function endgame(i, j) {
+  endStopWatch()
+  var elH1 = document.querySelector('h1')
+  elH1.innerText = 'Mines are bad for you...'
+  renderCell({ i, j }, MINE)
+  var elCells = document.querySelectorAll('.cell')
+
+  for (let i = 0; i < elCells.length; i++) {
+    elCells[i].classList.add('game-over')
+  }
+  var elBtn = document.querySelector('.restart')
+  elBtn.hidden = false
 }
 
 function revelNegs() {
@@ -144,14 +146,15 @@ function revelNegs() {
     removeClassByLocation(location, 'hidden')
   }
 
-  // !maybe find negs of negs
-  for (let i = 0; i < gCurrCellNegs.length; i++) {
-    var cell = gCurrCellNegs[i]
-    console.log('cell:', cell.i, cell.j)
-    var currNeg = gCurrCellNegs.splice(i, 1)
-    var res = countMinesAround(gBoard, currNeg.i, currNeg.j)
-    console.log('res:', res)
-  }
+  //!delete this at the end
+  // // !maybe find negs of negs
+  // for (let i = 0; i < gCurrCellNegs.length; i++) {
+  //   var cell = gCurrCellNegs[i]
+  //   console.log('cell:', cell.i, cell.j)
+  //   var currNeg = gCurrCellNegs.splice(i, 1)
+  //   var res = countMinesAround(gBoard, currNeg.i, currNeg.j)
+  //   console.log('res:', res)
+  // }
 
   gCurrCellNegs = []
 }
@@ -200,5 +203,4 @@ function updateWatch() {
 function endStopWatch() {
   clearInterval(gWatchInterval)
   gWatchInterval = null
-  console.log('stop')
 }
