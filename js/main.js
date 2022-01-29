@@ -27,9 +27,12 @@ function initGame() {
 
   gBoard = buildBoard()
   renderBoard(gBoard)
+  startTimer()
 }
 
 function resetUi() {
+  gGame.secsPassed = 0
+  stopTimer()
   var elMinesLeft = document.querySelector('.mines')
   elMinesLeft.innerText = gLevel.MINES
   var elSmiley = document.querySelector('.smiley')
@@ -65,7 +68,6 @@ function cellClicked(elCell, i, j) {
   var elLivesSpan = document.querySelectorAll('.lives-container span')
   var currCell = gBoard[i][j]
   if (gGame.isFirstClick) {
-    // startTimer()
     renderBoard(gBoard)
     var minesLocations = getMinesLocations(gLevel.MINES)
     placeMinesOnBoard(minesLocations)
@@ -84,7 +86,6 @@ function cellClicked(elCell, i, j) {
     currCell.isShown = true
     renderBoard(gBoard)
     gGame.lives--
-    console.log('lives:', gGame.lives)
 
     elLivesSpan[gGame.lives].classList.add('crashed')
     return
@@ -99,10 +100,9 @@ function cellClicked(elCell, i, j) {
     return
   }
 
-  console.log('elcell clicked')
   gBoard[i][j].isShown = true
   gGame.shownCount++
-  console.log(elCell)
+
   expandShown(gBoard, elCell, i, j)
 
   checkGameOver()
@@ -111,11 +111,10 @@ function cellClicked(elCell, i, j) {
 
 function cellMarked(elCell, ev, i, j) {
   if (!gGame.isOn) return
-  // startTimer()
+
   ev.preventDefault()
   var elMarked = document.querySelector('.marked')
 
-  console.log('right click')
   if (gBoard[i][j].isMarked) {
     gBoard[i][j].isMarked = false
     gGame.markedCount--
@@ -137,11 +136,11 @@ function checkGameOver() {
   if (isAllMInesMarked() && isAllCellsShown()) {
     stopTimer()
     var elH1 = document.querySelector('h1')
-    elH1.innerText = 'you are Victorias'
+    elH1.innerText = 'You are Victorias'
 
     var elSmiley = document.querySelector('.smiley')
     elSmiley.innerText = SMILEY_WIN
-
+    stopTimer()
     return
   }
 }
@@ -158,7 +157,6 @@ function isAllMInesMarked() {
 }
 
 function expandShown(board, elCell, i, j) {
-  console.log(board[i][j])
   var negsPoses = getCellNegs(board, i, j)
 
   for (let i = 0; i < negsPoses.length; i++) {
@@ -166,33 +164,29 @@ function expandShown(board, elCell, i, j) {
 
     gBoard[negPos.i][negPos.j].isShown = true
   }
-  console.log('expend board')
-
-  // startTimer()
 }
-// var gTimer
-// function startTimer() {
-//   gTimer = setInterval(showTime, 1000)
-// }
+var gTimer
+function startTimer() {
+  gTimer = setInterval(showTime, 1000)
+}
 
-// function showTime() {
-//   var elTimerSpan = document.querySelector('.timer')
-//   elTimerSpan.innerText = gGame.secsPassed++
-// }
+function showTime() {
+  var elTimerSpan = document.querySelector('.timer')
+  elTimerSpan.innerText = gGame.secsPassed++
+}
 
-// function stopTimer() {
-//   clearInterval(gTimer)
-//   gTimer = null
-// }
+function stopTimer() {
+  clearInterval(gTimer)
+  gTimer = null
+}
 
 function gameLost() {
-  console.log('game lost')
+  stopTimer()
   var elH1 = document.querySelector('h1')
   elH1.innerText = 'mines are bad for you'
   var elSmiley = document.querySelector('.smiley')
   elSmiley.innerText = SMILEY_LOSE
   gGame.isOn = false
-  stopTimer()
 
   return
 }
@@ -230,7 +224,6 @@ function checkHintCell(i, j) {
 
   var negsPoses = getCellHIntNegs(gBoard, i, j)
   var negsCopy = negsPoses.slice()
-  console.log('negsCopy:', negsCopy)
 
   for (let i = 0; i < negsPoses.length; i++) {
     var negPos = negsPoses[i]
@@ -247,7 +240,6 @@ function checkHintCell(i, j) {
 }
 
 function resetHint(negsCopy, i, j) {
-  console.log(negsCopy, i, j)
   var currCell = gBoard[i][j]
   for (let i = 0; i < negsCopy.length; i++) {
     var negPos = negsCopy[i]
