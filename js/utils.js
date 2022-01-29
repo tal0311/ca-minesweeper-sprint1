@@ -128,7 +128,7 @@ function getMinesLocations(minesNum) {
     }
     minesPoses.push(pos)
   }
-  console.log(minesPoses)
+ 
   return minesPoses
 }
 
