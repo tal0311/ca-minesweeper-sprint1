@@ -32,7 +32,10 @@ function initGame() {
 
 function resetUi() {
   gGame.secsPassed = 0
+  gGame.markedCount = 0
   stopTimer()
+  elLivesSpan = document.querySelectorAll('.lives-container span')
+  elLivesSpan.innerText = gGame.markedCount
   var elMinesLeft = document.querySelector('.mines')
   elMinesLeft.innerText = gLevel.MINES
   var elSmiley = document.querySelector('.smiley')
@@ -86,7 +89,7 @@ function cellClicked(elCell, i, j) {
     currCell.isShown = true
     renderBoard(gBoard)
     gGame.lives--
-
+    checkGameOver()
     elLivesSpan[gGame.lives].classList.add('crashed')
     return
   }
@@ -119,7 +122,7 @@ function cellMarked(elCell, ev, i, j) {
     gBoard[i][j].isMarked = false
     gGame.markedCount--
     elMarked.innerText = gGame.markedCount
-
+    checkGameOver()
     renderBoard(gBoard)
     return
   }
@@ -133,6 +136,7 @@ function cellMarked(elCell, ev, i, j) {
 }
 
 function checkGameOver() {
+  console.log(gBoard)
   if (isAllMInesMarked() && isAllCellsShown()) {
     stopTimer()
     var elH1 = document.querySelector('h1')
@@ -149,10 +153,12 @@ function isAllMInesMarked() {
   for (let i = 0; i < gBoard.length; i++) {
     for (let j = 0; j < gBoard.length; j++) {
       var cell = gBoard[i][j]
-      if (!cell.isMine) continue
-      if (cell.isMarked) markedMines++
+
+      if ((cell.isMine && cell.isShown) || (cell.isMine && cell.isMarked))
+        markedMines++
     }
   }
+  console.log('markedMines:', markedMines)
   return markedMines === gLevel.MINES ? true : false
 }
 
@@ -210,8 +216,8 @@ function isAllCellsShown() {
       shownCells++
     }
   }
-
-  return shownCells === gLevel.SIZE ** 2 - gLevel.MINES ? true : false
+  console.log('shownCells:', shownCells)
+  return shownCells >= gLevel.SIZE ** 2 - gLevel.MINES ? true : false
 }
 
 function hideHint(elHint) {

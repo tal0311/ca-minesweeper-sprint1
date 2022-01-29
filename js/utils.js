@@ -66,7 +66,8 @@ function getCellNegs(mat, rowIdx, colIdx) {
       if (j < 0 || j > mat[0].length - 1) continue
       if (i === rowIdx && j === colIdx) continue
       var currCell = mat[i][j]
-      if (currCell.isMine) continue
+      if (currCell.isMine) break
+      if (currCell.marked) continue
 
       negsPoses.push({ i: i, j: j })
     }
@@ -127,6 +128,7 @@ function getMinesLocations(minesNum) {
     }
     minesPoses.push(pos)
   }
+  console.log(minesPoses)
   return minesPoses
 }
 
