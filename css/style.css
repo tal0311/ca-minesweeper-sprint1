@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap');
+
+body {
+  font-family: 'Playfair Display', serif;
+  background-color: #333;
+}
+
+.btn {
+  font-family: inherit;
+  height: 40px;
+  width: 80px;
+  color: #333;
+  font-weight: 700;
+  font-size: large;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  background-color: rgb(218, 217, 217);
+  border-radius: 2px;
+}
+
+h1 {
+  color: antiquewhite;
+  letter-spacing: 2px;
+}
+table tr td {
+  height: 25px;
+  width: 25px;
+  border: 3px solid white;
+  color: antiquewhite;
+  cursor: pointer;
+  background-color: #888;
+}
+
+.hidden {
+  background-color: antiquewhite;
+}
+
+.timer-container {
+  text-align: center;
+}
+
+.board {
+  padding-top: 15px;
+  width: 100%;
+}
+
+.board table {
+  margin: auto;
+}
+
+.smiley {
+  font-size: 30px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.lives-container img {
+  height: 60px;
+  width: 60px;
+  color: antiquewhite;
+  font-weight: bold;
+  background-color: antiquewhite;
+  border-radius: 50%;
+}
+
+.crashed {
+  transition: 0.6s ease-out;
+  opacity: 0.1;
+}
+
+.hint-container {
+  position: relative;
+  position: absolute;
+  top: 50%;
+}
+
+.hint {
+  background-color: rgb(39, 35, 31);
+  height: 70px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  width: 150px;
+  display: flex;
+  justify-content: end;
+  margin-bottom: 10px;
+  border-bottom-right-radius: 20px;
+  border-top-right-radius: 20px;
+}
+.hint span {
+  background-color: antiquewhite;
+  margin-right: 5px;
+  border-radius: 50%;
+  width: 40px;
+  padding-right: 50px;
+  position: relative;
+}
+
+.icon {
+  height: 50px;
+  width: 115px;
+  padding-right: 40px;
+  position: absolute;
+  left: -10%;
+  top: 15%;
+  bottom: 10%;
+}
+
+.hide-hint {
+  transform: translateX(-100%);
+  transition: transform ease-out 0.2s;
+}
+
+.counter-container {
+  margin-bottom: 10px;
+}
+
+.counter {
+  font-size: x-large;
+  color: aliceblue;
+}
+.marked {
+  color: antiquewhite;
+}
+.mines {
+  color: crimson;
+}
+
+.timer {
+  color: antiquewhite;
+  margin: 10px;
+  position: absolute;
+  top: -48%;
+}
+.time-wrap {
+  position: relative;
+  color: #888;
+}

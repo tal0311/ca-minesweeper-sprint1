@@ -1,269 +1,261 @@
 'use strict'
 
+var gBoard
+
 var gLevel = {
   SIZE: 4,
   MINES: 2,
 }
 
-var gMineCount
-var gCurrCellNegs = []
-var gStartTime
-var gWatchInterval
-var gBoard
-var gStrikes
-
 var gGame = {
   isOn: false,
   shownCount: 0,
-  markedCount: 0, //!delete this
-  secsPassed: 0, // TODO: MAKE THIS WORK
-  isFirstMove: true,
+  markedCount: 0,
+  secsPassed: 1,
+  isFirstClick: true,
+  lives: 2,
+  isHintMode: false,
 }
 
-function init() {
-  endStopWatch()
-  gGame.isFirstMove = true
+function initGame() {
   gGame.isOn = true
+  gGame.isFirstClick = true
+  gGame.lives = 3
+  gGame.markedCount = 0
+
   resetUi()
-  gBoard = buildMat()
-  getRandomMinePos(gLevel.MINES)
-  renderBoard(gBoard, '.main')
+
+  gBoard = buildBoard()
+  renderBoard(gBoard)
+}
+
+function resetUi() {
+  var elMinesLeft = document.querySelector('.mines')
+  elMinesLeft.innerText = gLevel.MINES
+  var elSmiley = document.querySelector('.smiley')
+  var elHints = document.querySelectorAll('.hint')
+  gGame.markedCount = 0
+
+  for (let i = 0; i < elHints.length; i++) {
+    var elHint = elHints[i]
+    elHint.classList.remove('hide-hint')
+  }
+
+  elSmiley.innerText = SMILEY_START
+  var elLivesSpan = document.querySelectorAll('.lives-container span')
+
+  for (let i = 0; i < elLivesSpan.length; i++) {
+    var live = elLivesSpan[i]
+    live.classList.remove('crashed')
+  }
+
+  var elH1 = document.querySelector('h1')
+  elH1.innerHTML = 'classic minesweeper'
 }
 
 function changeLevel(size, mines) {
   gLevel.SIZE = size
   gLevel.MINES = mines
 
-  init()
+  initGame()
 }
+function cellClicked(elCell, i, j) {
+  if (!gGame.isOn) return
 
-function clickCell(elCell, i, j) {
-  gCurrCellNegs = []
-
+  var elLivesSpan = document.querySelectorAll('.lives-container span')
   var currCell = gBoard[i][j]
-  currCell.isShown = true
-  if (gGame.isFirstMove) {
-    startStopWatch()
+  if (gGame.isFirstClick) {
+    // startTimer()
+    renderBoard(gBoard)
+    var minesLocations = getMinesLocations(gLevel.MINES)
+    placeMinesOnBoard(minesLocations)
+    setMinesNegsCount(gBoard)
+    gGame.isFirstClick = false
+  }
+  if (gGame.isHintMode) {
+    checkHintCell(i, j)
+    return
   }
 
-  if (gGame.isFirstMove && currCell.isMine) {
-    firstMove(i, j)
+  if (currCell.isMarked) return
+  if (currCell.isShown) return
+
+  if (currCell.isMine && gGame.lives > 1) {
+    currCell.isShown = true
+    renderBoard(gBoard)
+    gGame.lives--
+    console.log('lives:', gGame.lives)
+
+    elLivesSpan[gGame.lives].classList.add('crashed')
     return
   }
-  if (elCell.dataset.ismine === 'true') {
-    gameOver(elCell, i, j)
+  if (currCell.isMine) {
+    gGame.lives--
+
+    elLivesSpan[gGame.lives].classList.add('crashed')
+    showAllMInes()
+    renderBoard(gBoard)
+    gameLost()
     return
   }
 
-  var minesAround = countMinesAround(gBoard, i, j)
-  if (minesAround > 0) {
-    currCell.isShown = true
-    elCell.classList.remove('hidden')
-    elCell.textContent = minesAround
-    gGame.isFirstMove = false
-    var hidden = remainderHiddenCells()
-    if (hidden < 0) checkVictory()
-    return
-  }
-  if (!minesAround) {
-    currCell.isShown = true
-    gGame.isFirstMove = false
-    elCell.classList.remove('hidden')
-    revelNegs({ i, j })
-    var hidden = remainderHiddenCells()
-    if (hidden < 0) checkVictory()
-  }
+  console.log('elcell clicked')
+  gBoard[i][j].isShown = true
+  gGame.shownCount++
+  console.log(elCell)
+  expandShown(gBoard, elCell, i, j)
+
+  checkGameOver()
+  renderBoard(gBoard)
 }
 
-function firstMove(i, j) {
-  gGame.isFirstMove = false
-  init()
-  gBoard[i][j].isMine = false
-  gBoard[i][j].isMine = true
-  renderCell({ i, j }, EMPTY)
-}
-
-function rightClick(ev, i, j) {
+function cellMarked(elCell, ev, i, j) {
+  if (!gGame.isOn) return
+  // startTimer()
   ev.preventDefault()
+  var elMarked = document.querySelector('.marked')
+
+  console.log('right click')
   if (gBoard[i][j].isMarked) {
-    renderCell({ i, j }, EMPTY)
     gBoard[i][j].isMarked = false
-    gMineCount++
-    updateCountUi()
-    checkVictory()
+    gGame.markedCount--
+    elMarked.innerText = gGame.markedCount
+
+    renderBoard(gBoard)
     return
   }
+
   gBoard[i][j].isMarked = true
-  renderCell({ i, j }, FLAG)
-  checkVictory()
-  gMineCount--
-  updateCountUi()
+  gGame.markedCount++
+  elMarked.innerText = gGame.markedCount
+
+  checkGameOver()
+  renderBoard(gBoard)
 }
 
-function updateCountUi() {
-  var elSpan = document.querySelector('.mines-counter span')
-  elSpan.innerText = gMineCount
+function checkGameOver() {
+  if (isAllMInesMarked() && isAllCellsShown()) {
+    stopTimer()
+    var elH1 = document.querySelector('h1')
+    elH1.innerText = 'you are Victorias'
+
+    var elSmiley = document.querySelector('.smiley')
+    elSmiley.innerText = SMILEY_WIN
+
+    return
+  }
 }
-function gameOver(elCell, i, j) {
-  updateStrike(elCell, i, j)
+function isAllMInesMarked() {
+  var markedMines = 0
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard.length; j++) {
+      var cell = gBoard[i][j]
+      if (!cell.isMine) continue
+      if (cell.isMarked) markedMines++
+    }
+  }
+  return markedMines === gLevel.MINES ? true : false
 }
 
-function localStorage() {
-  console.log('this function will put value in local storage')
+function expandShown(board, elCell, i, j) {
+  console.log(board[i][j])
+  var negsPoses = getCellNegs(board, i, j)
+
+  for (let i = 0; i < negsPoses.length; i++) {
+    var negPos = negsPoses[i]
+
+    gBoard[negPos.i][negPos.j].isShown = true
+  }
+  console.log('expend board')
+
+  // startTimer()
 }
+// var gTimer
+// function startTimer() {
+//   gTimer = setInterval(showTime, 1000)
+// }
 
-var gElstrikes = document.querySelectorAll('.strikes-container img')
-function updateStrike(elCell, i, j) {
-  var strike = gElstrikes[gStrikes]
-  strike.classList.add('crashed')
-  gStrikes++
+// function showTime() {
+//   var elTimerSpan = document.querySelector('.timer')
+//   elTimerSpan.innerText = gGame.secsPassed++
+// }
 
-  elCell.classList.add('mine')
-  renderCell({ i, j }, MINE)
-  if (gStrikes > 2) endGame(i, j)
+// function stopTimer() {
+//   clearInterval(gTimer)
+//   gTimer = null
+// }
+
+function gameLost() {
+  console.log('game lost')
+  var elH1 = document.querySelector('h1')
+  elH1.innerText = 'mines are bad for you'
+  var elSmiley = document.querySelector('.smiley')
+  elSmiley.innerText = SMILEY_LOSE
+  gGame.isOn = false
+  stopTimer()
+
   return
 }
 
-function endGame(i, j) {
-  renderSmiley('lose')
-  endStopWatch()
-  var elH1 = document.querySelector('h1')
-  elH1.style.color = 'rgb(223, 87, 114)'
-  elH1.innerText = 'Mines are bad for you...'
-  renderCell({ i, j }, MINE)
-  var elCells = document.querySelectorAll('.cell')
-  for (let i = 0; i < elCells.length; i++) {
-    elCells[i].classList.add('game-over')
-  }
-  var minesPos = getAllMines()
-  showAllMines(minesPos)
-  var elBtn = document.querySelector('.restart')
-  elBtn.hidden = false
-}
-
-function showAllMines(locations) {
-  for (let i = 0; i < locations.length; i++) {
-    var location = locations[i]
-    renderCell(location, MINE)
-  }
-}
-
-function revelNegs() {
-  for (let i = 0; i < gCurrCellNegs.length; i++) {
-    gCurrCellNegs[i].isShown = true
-    var location = { i: gCurrCellNegs[i].i, j: gCurrCellNegs[i].j }
-    removeClassByLocation(location, 'hidden')
-  }
-  gCurrCellNegs = []
-}
-
-function checkVictory() {
-  var count = 0
+function showAllMInes() {
   for (let i = 0; i < gBoard.length; i++) {
-    for (let j = 0; j < gBoard[0].length; j++) {
+    for (let j = 0; j < gBoard.length; j++) {
       var cell = gBoard[i][j]
-      if (cell.isMine && cell.isMarked) count++
+      if (!cell.isMine) continue
+      if (!cell.isShown) cell.isShown = true
+    }
+  }
+}
+
+function isAllCellsShown() {
+  var shownCells = 0
+  for (let i = 0; i < gBoard.length; i++) {
+    for (let j = 0; j < gBoard.length; j++) {
+      var cell = gBoard[i][j]
+      if (!cell.isShown) continue
+      shownCells++
     }
   }
 
-  var hidden = remainderHiddenCells()
-
-  if (count === gLevel.MINES && hidden < 0) {
-    var elH1 = document.querySelector('h1')
-
-    elH1.style.backgroundColor = 'rgb(223, 87, 114)'
-    elH1.innerText = 'You are Victorious'
-    renderSmiley('win')
-    endStopWatch()
-  }
+  return shownCells === gLevel.SIZE ** 2 - gLevel.MINES ? true : false
 }
 
-function remainderHiddenCells() {
-  var hiddenCells = getHiddenMines()
-  var length = hiddenCells.length
-
-  return length - 1
-}
-
-function resetUi() {
-  //!move ui reset to another file
-
-  gStrikes = 0
-  gMineCount = gLevel.MINES
-  renderSmiley('start')
-  updateCountUi()
-  var elH1 = document.querySelector('h1')
-  elH1.style.backgroundColor = '#333'
-  elH1.style.color = 'antiquewhite'
-  elH1.innerText = 'Classic Minesweeper'
-  var elBtn = document.querySelector('.restart')
-  elBtn.hidden = true
-  var elTime = document.querySelector('.timer span')
-  elTime.innerText = 0
-  var elStrikes = document.querySelectorAll('.strikes-container img')
-  for (let i = 0; i < elStrikes.length; i++) {
-    var strike = elStrikes[i]
-    strike.classList.remove('crashed')
-  }
-
-  var elHints = document.querySelectorAll('.hint')
-  for (let i = 0; i < elHints.length; i++) {
-    var elHint = elHints[i]
-    elHint.classList.remove('hide-hint')
-  }
-}
-
-//!not working well...
-function startStopWatch() {
-  debugger
-  gWatchInterval = setInterval(updateWatch, 1)
-  gStartTime = Date.now()
-}
-
-function updateWatch() {
-  var now = Date.now()
-  var time = ((now - gStartTime) / 1000).toFixed()
-  var elTime = document.querySelector('.timer span')
-  elTime.innerText = time
-}
-
-function endStopWatch() {
-  clearInterval(gWatchInterval)
-  gWatchInterval = null
-}
-
-function renderSmiley(gameStatus) {
-  var smiley = document.querySelector('.smiley')
-
-  switch (gameStatus) {
-    case 'win':
-      smiley.innerText = SMILEY_WIN
-      break
-    case 'lose':
-      smiley.innerText = SMILEY_LOSE
-      break
-    case 'start':
-      smiley.innerText = SMILEY_START
-  }
-}
-
-var ghiddencells
-function useHint(elHint) {
+function hideHint(elHint) {
   elHint.classList.add('hide-hint')
-  activateHint()
+  gGame.isHintMode = true
 }
 
-function activateHint() {
-  ghiddencells = getHiddenMines()
-  var showCells = ghiddencells.slice()
-  for (let i = 0; i < showCells.length; i++) {
-    var elCell = showCells[i]
-    elCell.classList.remove('hidden')
+function checkHintCell(i, j) {
+  var currCell = gBoard[i][j]
+
+  var negsPoses = getCellHIntNegs(gBoard, i, j)
+  var negsCopy = negsPoses.slice()
+  console.log('negsCopy:', negsCopy)
+
+  for (let i = 0; i < negsPoses.length; i++) {
+    var negPos = negsPoses[i]
+
+    gBoard[negPos.i][negPos.j].isShown = true
   }
+  currCell.isShown = true
+
+  renderBoard(gBoard)
+
   setTimeout(function () {
-    for (let i = 0; i < showCells.length; i++) {
-      var elCell = showCells[i]
-      elCell.classList.add('hidden')
-    }
-  }, 1500)
+    resetHint(negsCopy, i, j)
+  }, 2000)
+}
+
+function resetHint(negsCopy, i, j) {
+  console.log(negsCopy, i, j)
+  var currCell = gBoard[i][j]
+  for (let i = 0; i < negsCopy.length; i++) {
+    var negPos = negsCopy[i]
+
+    gBoard[negPos.i][negPos.j].isShown = false
+  }
+  currCell.isShown = false
+
+  gGame.isHintMode = false
+  renderBoard(gBoard)
 }

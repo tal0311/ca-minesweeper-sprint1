@@ -4,51 +4,52 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mine swiper</title>
-    <link rel="stylesheet" href="./css/main.css" />
+    <title>Document</title>
+
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
-  <body onload="init()">
-    <h1>Classic Minesweeper</h1>
 
-    <div class="btn-container">
-      <button class="btn" onclick="changeLevel(4,2)">Basic</button>
-      <button class="btn" onclick="changeLevel(8, 12)">Pro</button>
-      <button class="btn" onclick="changeLevel(12,30)">Expert</button>
+  <body onload="initGame()">
+    <div class="timer-container">
+      <h1>classic minesweeper</h1>
+      <div class="btn-container">
+        <button class="btn" onclick="changeLevel(4,2)">Basic</button>
+        <button class="btn" onclick="changeLevel(8, 12)">Pro</button>
+        <button class="btn" onclick="changeLevel(12,30)">Expert</button>
+      </div>
+
+      <div class="counter-container">
+        <div class="counter">
+          <span class="marked"></span> /
+          <span class="mines"></span>
+        </div>
+        <div class="time-wrap">Time:<span class="timer"></span></div>
+      </div>
+
+      <div class="lives-container">
+        <span><img src="./src/-7.svg" alt="" /></span>
+        <span><img src="./src/-7.svg" alt="" /></span>
+        <span><img src="./src/-7.svg" alt="" /></span>
+      </div>
+      <div class="smiley-container">
+        <div class="smiley" onclick="initGame()">😃</div>
+      </div>
     </div>
 
-    <div class="header">
-      <div class="timer">
-        <span></span>
-      </div>
-      <div class="strikes-container">
-        <img src="./src/-7.svg" alt="" />
-        <img src="./src/-7.svg" alt="" />
-        <img src="./src/-7.svg" alt="" />
-      </div>
-      <div class="mines-counter-container">
-        <div class="mines-counter">Mines left <span></span></div>
-      </div>
-    </div>
-    <div class="smiley-container">
-      <p class="smiley" onclick="init()"></p>
-    </div>
-    <div class="main"></div>
+    <div class="board"></div>
     <aside class="hint-container">
-      <div class="hint hint1" onclick="useHint(this)">
+      <div class="hint hint1" onclick="hideHint(this)">
         <span> <img class="icon" src="./src/hint.png" alt="" /></span>
       </div>
-      <div class="hint hint2" onclick="useHint(this)">
+      <div class="hint hint2" onclick="hideHint(this)">
         <span> <img class="icon" src="./src/hint.png" alt="" /></span>
       </div>
-      <div class="hint hint3" onclick="useHint(this)">
+      <div class="hint hint3" onclick="hideHint(this)">
         <span onclick> <img class="icon" src="./src/hint.png" alt="" /></span>
       </div>
     </aside>
 
-    <div>
-      <button class="restart btn" onclick="init()">Try Again</button>
-    </div>
-    <script src="./js/main.js"></script>
     <script src="./js/utils.js"></script>
+    <script src="./js/main.js"></script>
   </body>
 </html>

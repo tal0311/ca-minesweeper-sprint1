@@ -1,63 +1,48 @@
 'use strict'
 
-const MINE = '💣'
 const FLAG = '🚩'
+const MINE = '💣'
 const EMPTY = ' '
 const SMILEY_START = '😃'
-const SMILEY_LOSE = '😞'
 const SMILEY_WIN = '😎'
+const SMILEY_LOSE = '🤯'
 
-// this will build mat
-function buildMat() {
+// this is the model
+function buildBoard() {
+  console.log('build board')
+
   var board = []
-  for (var i = 0; i < gLevel.SIZE; i++) {
-    board[i] = []
-    for (var j = 0; j < gLevel.SIZE; j++) {
-      board[i][j] = {
+  for (let i = 0; i < gLevel.SIZE; i++) {
+    var row = []
+    for (let j = 0; j < gLevel.SIZE; j++) {
+      var cell = {
         minesAroundCount: 0,
         isShown: false,
         isMine: false,
         isMarked: false,
       }
+      row.push(cell)
     }
+    board.push(row)
   }
 
+  console.table(board)
   return board
 }
 
-// this will print mat to html
-function renderBoard(mat, selector) {
-  var strHTML = `<table border="1"><tbody>`
-  for (var i = 0; i < gLevel.SIZE; i++) {
-    strHTML += `<tr>`
-    for (var j = 0; j < gLevel.SIZE; j++) {
-      var cell = mat[i][j]
-      var className = `hidden cell cell-${i}-${j}`
-      strHTML += `<td  data-ismine="${cell.isMine}" class=" ${className}" onclick="clickCell(this, ${i}, ${j})" oncontextmenu="rightClick(event, ${i},${j})" contextmenu="mymenu">  </td>`
-    }
-    strHTML += `</tr>`
-  }
-  strHTML += `</tbody></table>`
-  var elContainer = document.querySelector(selector)
-  elContainer.innerHTML = strHTML
-}
-// function firstRender(mat, selector) {
-//   var strHTML = `<table border="1"><tbody>`
-//   for (var i = 0; i < gLevel.SIZE; i++) {
-//     strHTML += `<tr>`
-//     for (var j = 0; j < gLevel.SIZE; j++) {
-//       var cell = mat[i][j]
-//       var className = `hidden cell cell-${i}-${j}`
-//       strHTML += `<td  class=" ${className}" onclick="clickCell(this, ${i}, ${j})" oncontextmenu="rightClick(event, ${i},${j})" contextmenu="mymenu">  </td>`
-//     }
-//     strHTML += `</tr>`
-//   }
-//   strHTML += `</tbody></table>`
-//   var elContainer = document.querySelector(selector)
-//   elContainer.innerHTML = strHTML
-// }
+// place mines manually
 
-// nags function will take mat location i j return negs count
+function setMinesNegsCount(board) {
+  console.log('set mines negs count')
+
+  for (let i = 0; i < board.length; i++) {
+    for (let j = 0; j < board.length; j++) {
+      var cell = board[i][j]
+      var minesNum = countMinesAround(board, i, j)
+      cell.countMinesAround = minesNum
+    }
+  }
+}
 
 function countMinesAround(mat, rowIdx, colIdx) {
   var count = 0
@@ -67,79 +52,118 @@ function countMinesAround(mat, rowIdx, colIdx) {
       if (j < 0 || j > mat[0].length - 1) continue
       if (i === rowIdx && j === colIdx) continue
       var currCell = mat[i][j]
-      gCurrCellNegs.push({ cell: gBoard[i][j], i, j })
       if (currCell.isMine) {
         count++
-        gBoard[rowIdx][colIdx].minesAroundCount = count
       }
     }
   }
-
   return count
 }
 
-function renderCell(location, value) {
-  var elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
+function getCellNegs(mat, rowIdx, colIdx) {
+  console.log(mat, rowIdx, colIdx)
+  var currCell = mat[rowIdx][colIdx]
+  if (currCell.minesAroundCount > 0) return
+  console.log('more then 0')
+  var negsPoses = []
+  for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+    if (i < 0 || i > mat.length - 1) continue
+    for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+      if (j < 0 || j > mat[0].length - 1) continue
+      if (i === rowIdx && j === colIdx) continue
+      var currCell = mat[i][j]
+      if (currCell.isMine) continue
 
-  elCell.innerHTML = value
+      negsPoses.push({ i: i, j: j })
+    }
+  }
+  console.log(negsPoses)
+  return negsPoses
 }
-function removeClassByLocation(location, value) {
-  var elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
 
-  elCell.classList.remove(value)
+function getCellHIntNegs(mat, rowIdx, colIdx) {
+  console.log(mat, rowIdx, colIdx)
+  var currCell = mat[rowIdx][colIdx]
+  if (currCell.minesAroundCount > 0) return
+  console.log('more then 0')
+  var negsPoses = []
+  for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+    if (i < 0 || i > mat.length - 1) continue
+    for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+      if (j < 0 || j > mat[0].length - 1) continue
+      if (i === rowIdx && j === colIdx) continue
+      var currCell = mat[i][j]
+      if (currCell.isShown) continue
+
+      negsPoses.push({ i: i, j: j })
+    }
+  }
+  console.log(negsPoses)
+  return negsPoses
 }
-var gMineposes
 
-function getRandomMinePos(length) {
-  gMineposes = []
+function renderBoard(board) {
+  console.log('render board')
 
-  for (let i = 0; i < length; i++) {
+  console.log('board from render board:', board)
+  var strHtml = '<table border="1"><tbody>'
+
+  for (let i = 0; i < board.length; i++) {
+    strHtml += `<tr>`
+    for (let j = 0; j < board[0].length; j++) {
+      var currCell = board[i][j]
+
+      strHtml += `<td class="${!currCell.isShown ? 'hidden' : ''} cell" 
+      oncontextmenu="cellMarked( this, event, ${i},${j})" 
+      contextmenu="mymenu" 
+      onclick="cellClicked(this, ${i},${j} )">
+      ${currCellContent(board, i, j) || EMPTY}</td>`
+    }
+    strHtml += `</tr>`
+  }
+
+  var elBoard = document.querySelector('.board')
+  elBoard.innerHTML = strHtml
+}
+//  board[i][j].isMine? MINE: board[i][j].countMinesAround
+
+function getMinesLocations(minesNum) {
+  console.log('minesNum from mines location:', minesNum)
+
+  var minesPoses = []
+
+  for (let i = 0; i < gLevel.MINES; i++) {
     var pos = {
       i: getRandomInt(0, gLevel.SIZE - 1),
       j: getRandomInt(0, gLevel.SIZE - 1),
     }
-    gMineposes.push(pos)
+    minesPoses.push(pos)
   }
+  return minesPoses
+}
 
-  if (gMineposes.length < gLevel.MINES) getRandomMinePos(gLevel.MINES)
-  placeMinesOnBoard(gMineposes)
+function placeMinesOnBoard(minesLocations) {
+  console.log('mines locations:', minesLocations)
+  for (let i = 0; i < minesLocations.length; i++) {
+    for (let j = 0; j < minesLocations.length; j++) {
+      var mine = minesLocations[i]
+      gBoard[mine.i][mine.j].isMine = true
+    }
+  }
 }
 
 function getRandomInt(min, max) {
   min = Math.ceil(min)
   max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min + 1)) + min
+  return Math.floor(Math.random() * (max - min + 1)) + min //The maximum is inclusive and the minimum is inclusive
 }
 
-function placeMinesOnBoard(minePoses) {
-  for (let i = 0; i < minePoses.length; i++) {
-    var mine = minePoses[i]
-    gBoard[mine.i][mine.j].isMine = true
-  }
-}
-
-function getAllMines() {
-  var minesPos = []
-  for (let i = 0; i < gBoard.length; i++) {
-    for (let j = 0; j < gBoard[0].length; j++) {
-      var cell = gBoard[i][j]
-      if (cell.isMine) {
-        minesPos.push({ i, j })
-      }
-    }
+function currCellContent(board, i, j) {
+  var currCell = board[i][j]
+  if (currCell.isShown) {
+    if (currCell.isMine) return MINE
+    else return currCell.countMinesAround
   }
 
-  return minesPos
-}
-
-function getHiddenMines() {
-  var hiddenCells = []
-  var hiddenTds = document.querySelectorAll('.hidden[data-ismine="false"]')
-
-  for (let i = 0; i < hiddenTds.length; i++) {
-    var elHiddenCell = hiddenTds[i]
-    hiddenCells.push(elHiddenCell)
-  }
-
-  return hiddenCells
+  if (currCell.isMarked) return FLAG
 }
