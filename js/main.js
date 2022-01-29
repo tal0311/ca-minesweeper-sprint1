@@ -136,7 +136,7 @@ function cellMarked(elCell, ev, i, j) {
 }
 
 function checkGameOver() {
-  
+  console.log(gBoard)
   if (isAllMInesMarked() && isAllCellsShown()) {
     stopTimer()
     var elH1 = document.querySelector('h1')
@@ -158,7 +158,7 @@ function isAllMInesMarked() {
         markedMines++
     }
   }
-  
+
   return markedMines === gLevel.MINES ? true : false
 }
 
@@ -216,7 +216,7 @@ function isAllCellsShown() {
       shownCells++
     }
   }
-  
+  console.log('shownCells:', shownCells)
   return shownCells >= gLevel.SIZE ** 2 - gLevel.MINES ? true : false
 }
 

@@ -116,7 +116,6 @@ function renderBoard(board) {
   var elBoard = document.querySelector('.board')
   elBoard.innerHTML = strHtml
 }
-//  board[i][j].isMine? MINE: board[i][j].countMinesAround
 
 function getMinesLocations(minesNum) {
   var minesPoses = []
@@ -128,7 +127,7 @@ function getMinesLocations(minesNum) {
     }
     minesPoses.push(pos)
   }
- 
+
   return minesPoses
 }
 
